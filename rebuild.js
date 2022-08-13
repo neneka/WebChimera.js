@@ -1,9 +1,9 @@
 function build() {
     var cmakeJS = require("cmake-js");
 
-    var defaultRuntime = "nw";
-    var defaultRuntimeVersion = "0.12.3";
-    var defaultWinArch = "ia32";
+    var defaultRuntime = "electron";
+    var defaultRuntimeVersion = "20.0.2";
+    var defaultWinArch = "x64";
 
     var options = {
         runtime: process.env.npm_config_wcjs_runtime || undefined,
