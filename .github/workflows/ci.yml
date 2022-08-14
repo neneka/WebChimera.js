@@ -1,0 +1,77 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - "**"
+    tags-ignore:
+      - "**"
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        node-version: [16.x]
+        target:
+          - x86_64-unknown-linux-gnu
+          - x86_64-pc-windows-gnu
+          - x86_64-apple-darwin
+        include:
+          - target: x86_64-unknown-linux-gnu
+            os: ubuntu-20.04
+          - target: x86_64-pc-windows-gnu
+            os: windows-2019
+          - target: x86_64-apple-darwin
+            os: macos-12
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: "recursive"
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+          registry-url: "https://registry.npmjs.org"
+      - uses: actions/cache@v2
+        if: runner.os == 'macOS'
+        id: vlc-cache
+        with:
+          path: /Applications/VLC.app
+          key: ${{ matrix.target }}-vlc-
+          restore-keys: |
+            ${{ matrix.target }}-vlc-
+      - name: Install VLC (macOS)
+        if: steps.vlc-cache.outputs.cache-hit != 'true' && runner.os == 'macOS'
+        run: |
+          wget -q https://github.com/vivid-lapin/vlc-miraktest/releases/download/3.0.17.2/vlc-3.0.17.2-x86_64.dmg -O /tmp/vlc.dmg
+          hdiutil mount /tmp/vlc.dmg
+          cp -Ra '/Volumes/VLC media player/VLC.app' /Applications
+      - name: Install VLC (Linux)
+        if: runner.os == 'Linux'
+        run: sudo apt-get install cmake=3.16.3-1ubuntu1 libvlc-dev=3.0.9.2-1
+      - name: Install VLC (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          Invoke-WebRequest -Uri 'https://github.com/vivid-lapin/vlc-miraktest/releases/download/3.0.16.3/vlc-windows-3.0.16.zip' -OutFile 'libvlc.zip'
+          Expand-Archive -Path '.\libvlc.zip' -DestinationPath . -Force
+          Remove-Item '.\libvlc.zip'
+      - name: Install
+        run: |
+          yarn
+      - name: Build
+        run: |
+          node rebuild.js
+        env:
+          BUILD_DIR: "./build/Release"
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ matrix.target }}-node
+          path: |
+            ./build/Release/WebChimera.js.node
