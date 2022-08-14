@@ -1,5 +1,5 @@
 {
-  "name": "@neneka/webchimera.js",
+  "name": "webchimera.js",
   "description": "libvlc binding for Electron",
   "version": "0.6.0",
   "license": "LGPL-2.1",
