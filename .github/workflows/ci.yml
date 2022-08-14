@@ -67,3 +67,11 @@ jobs:
       - name: Build
         run: |
           node rebuild.js
+        env:
+          BUILD_DIR: "./build/Release"
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ matrix.target }}-node
+          path: |
+            ./build/Release/WebChimera.js.node
