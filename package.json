@@ -24,9 +24,14 @@
   "packageManager": "yarn@1.22.18",
   "files": [
     "package.json",
+    "src",
     "index.js",
     "index.d.ts",
-    "deps/libvlc_wrapper"
+    "deps/libvlc_wrapper",
+    "src",
+    ".gitmodules",
+    "CMakeLists.txt",
+    "rebuild.js"
   ],
   "main": "index.js",
   "types": "index.d.ts"
