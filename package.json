@@ -25,6 +25,7 @@
   "files": [
     "package.json",
     "index.js",
+    "index.d.ts",
     "deps/libvlc_wrapper"
   ],
   "main": "index.js",
